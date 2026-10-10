@@ -2,6 +2,8 @@
 # Cách dùng: đẩy mã nguồn lên GitHub, vào tab Actions > "Đóng gói Nhắc Việc" > Run workflow,
 # chạy xong tải bộ cài ở mục Artifacts.
 name: Đóng gói Nhắc Việc
+permissions:
+  contents: write
 on:
   workflow_dispatch:
   push:
@@ -51,3 +53,21 @@ jobs:
         with:
           name: NhacViec-Android
           path: mobile/android/app/build/outputs/apk/debug/*.apk
+
+  draft:
+    # Gom các bộ cài vào một bản phát hành NHÁP (chỉ chủ kho thấy) để tải về dễ dàng
+    needs: [build, android]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: out
+      - name: Tạo bản nháp
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          V=$(date +%Y%m%d-%H%M)
+          mv out/NhacViec-Android/*.apk out/NhacViec-Android/NhacViec-android.apk
+          gh release create "build-$V" --repo "${{ github.repository }}" --draft \
+            --title "Bản build $V" --notes "Bản build tự động từ ${{ github.sha }}" \
+            out/NhacViec-Windows/*.exe out/NhacViec-macOS/*.dmg out/NhacViec-Android/*.apk
