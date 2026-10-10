@@ -6,6 +6,12 @@
 <meta name="theme-color" content="#3366ff">
 <title>Nhắc Việc</title>
 <link rel="stylesheet" href="mobile.css">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Nhắc Việc">
 </head>
 <body>
 <div class="app" id="app">
@@ -67,7 +73,8 @@
   <label class="big-btn">📂 Chọn file .nhacviec.json
     <input type="file" id="file" accept=".json,application/json" hidden></label>
   <button class="big-btn" id="btnDemo">👀 Xem thử bằng dữ liệu mẫu</button>
-  <div class="opt">
+  <p class="web-note muted small hidden" id="webNote"></p>
+  <div class="opt" id="optNotif">
     <div><b>Thông báo trên điện thoại</b><div class="muted small">Nhắc đúng các mốc đã đặt trên máy tính</div></div>
     <label class="switch"><input type="checkbox" id="notifOn" checked><span></span></label>
   </div>

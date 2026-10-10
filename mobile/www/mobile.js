@@ -345,7 +345,21 @@
     const l = savedLink(); if (l && !$('#mAddr').value) $('#mAddr').value = l.host;
     $('#mAddr').focus();
   }
+  const native = () => !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+  const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   function prepSync() {
+    if (!native()) {
+      // Bản web (iPhone qua Safari): trình duyệt không cho tải dữ liệu từ máy tính qua Wi-Fi (http) và không đặt được thông báo hẹn giờ
+      ['#btnAgain', '#btnScan', '#btnManual', '#manual', '#optNotif'].forEach(s => $(s).classList.add('hidden'));
+      $('.or').classList.add('hidden');
+      $('label.big-btn').classList.add('primary');
+      $('#dlgSync p.muted').innerHTML = 'Trên máy tính chọn <b>📦 Dữ liệu → 📤 Xuất toàn bộ dữ liệu</b>, gửi file <code>.nhacviec.json</code> sang điện thoại (Zalo, email, AirDrop…).';
+      $('#webNote').classList.remove('hidden');
+      $('#webNote').innerHTML = isIOS
+        ? 'iPhone: trong Zalo / Mail, mở file → <b>Chia sẻ → Lưu vào Tệp</b>, rồi bấm nút trên và chọn file trong <b>Tệp</b>. Ghim app: Safari → <b>Chia sẻ → Thêm vào MH chính</b>.'
+        : 'Đây là bản web. Bản cài Android (APK) đồng bộ được qua Wi-Fi và có thông báo nhắc giờ.';
+      return;
+    }
     const l = savedLink();
     $('#btnAgain').classList.toggle('hidden', !l);
     if (l) $('#btnAgain').textContent = `⟳ Lấy lại từ máy tính ${l.host.split(':')[0]}`;
@@ -410,6 +424,9 @@
   // Gập / mở máy: chuyển giữa 1 cột và 2 cột
   matchMedia('(min-width: 700px)').addEventListener('change', () => { if (wide()) closeTask(); setView(state.view); });
   setInterval(render, 60000);   // cập nhật đếm ngược / quá hạn mỗi phút
+
+  // Bản web: lưu sẵn để mở khi không có mạng
+  if (!native() && 'serviceWorker' in navigator && location.protocol === 'https:' && !window.AUTO_DEMO) navigator.serviceWorker.register('sw.js').catch(() => {});
 
   // URL ?demo=1 để xem thử ngay
   if (!db && (window.AUTO_DEMO || new URLSearchParams(location.search).has('demo'))) demo(); else { render(); setView('today'); }
