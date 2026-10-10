@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#3366ff">
+<title>Nhắc Việc</title>
+<link rel="stylesheet" href="mobile.css">
+</head>
+<body>
+<div class="app" id="app">
+  <!-- Cột danh sách (luôn có) -->
+  <section class="pane list-pane">
+    <header class="top">
+      <div class="hello">
+        <div class="muted" id="today"></div>
+        <h1 id="viewTitle">Hôm nay</h1>
+      </div>
+      <button class="icon" id="btnSync" aria-label="Đồng bộ">⟳</button>
+    </header>
+    <div class="sync-bar" id="syncBar"></div>
+    <div class="search"><input id="q" type="search" placeholder="🔍 Tìm việc, dự án, người…"></div>
+    <nav class="seg" id="seg">
+      <button data-view="today" class="on">Hôm nay <b></b></button>
+      <button data-view="week">7 ngày <b></b></button>
+      <button data-view="late">Quá hạn <b></b></button>
+      <button data-view="alerts">Lịch nhắc <b></b></button>
+      <button data-view="projects">Dự án</button>
+      <button data-view="done">Đã xong</button>
+    </nav>
+    <main id="list" class="list"></main>
+  </section>
+
+  <!-- Cột chi tiết: trượt lên trên điện thoại thanh, cố định bên phải khi mở Z Fold -->
+  <section class="pane detail-pane" id="detail" aria-hidden="true">
+    <header class="top detail-top">
+      <button class="icon back" id="btnBack" aria-label="Quay lại">‹</button>
+      <h2 id="dTitle">Chọn một việc</h2>
+    </header>
+    <div id="dBody" class="d-body"><div class="empty">👈 Chọn một việc để xem chi tiết</div></div>
+  </section>
+
+  <!-- Thanh tab dưới (điện thoại thanh) -->
+  <nav class="tabbar" id="tabbar">
+    <button data-view="today" class="on"><i>☀️</i>Hôm nay</button>
+    <button data-view="week"><i>📅</i>7 ngày</button>
+    <button data-view="alerts"><i>🔔</i>Nhắc</button>
+    <button data-view="projects"><i>📁</i>Dự án</button>
+    <button data-view="more"><i>⋯</i>Khác</button>
+  </nav>
+</div>
+
+<!-- Bảng đồng bộ -->
+<dialog id="dlgSync" class="sheet">
+  <div class="grab"></div>
+  <h3>Đồng bộ từ máy tính</h3>
+  <p class="muted">Trên máy tính chọn <b>📦 Dữ liệu → 📱 Đồng bộ sang điện thoại</b>, rồi quét mã QR hiện ra. Hai máy cần chung Wi-Fi.</p>
+  <button class="big-btn primary hidden" id="btnAgain">⟳ Lấy lại từ máy tính</button>
+  <button class="big-btn primary" id="btnScan">📷 Quét mã QR trên máy tính</button>
+  <button class="big-btn" id="btnManual">⌨️ Nhập địa chỉ và mã</button>
+  <form id="manual" class="manual hidden">
+    <label>Địa chỉ trên máy tính<input id="mAddr" inputmode="decimal" placeholder="192.168.1.5:47800" autocomplete="off"></label>
+    <label>Mã 6 số<input id="mCode" inputmode="numeric" maxlength="7" placeholder="123 456" autocomplete="off"></label>
+    <button class="big-btn primary" type="submit">Nhận dữ liệu</button>
+  </form>
+  <div class="or"><span>hoặc không chung Wi-Fi</span></div>
+  <label class="big-btn">📂 Chọn file .nhacviec.json
+    <input type="file" id="file" accept=".json,application/json" hidden></label>
+  <button class="big-btn" id="btnDemo">👀 Xem thử bằng dữ liệu mẫu</button>
+  <div class="opt">
+    <div><b>Thông báo trên điện thoại</b><div class="muted small">Nhắc đúng các mốc đã đặt trên máy tính</div></div>
+    <label class="switch"><input type="checkbox" id="notifOn" checked><span></span></label>
+  </div>
+  <form method="dialog"><button class="big-btn ghost">Đóng</button></form>
+</dialog>
+
+<!-- Menu Khác (điện thoại thanh) -->
+<dialog id="dlgMore" class="sheet">
+  <div class="grab"></div>
+  <button class="row-btn" data-view="late">⚠️ Quá hạn <b id="mLate"></b></button>
+  <button class="row-btn" data-view="done">✅ Đã xong</button>
+  <button class="row-btn" data-go="sync">⟳ Đồng bộ dữ liệu</button>
+  <form method="dialog"><button class="big-btn ghost">Đóng</button></form>
+</dialog>
+
+<div class="toast" id="toast"></div>
+<script src="lunar.js"></script>
+<script src="remind.js"></script>
+<script src="demo-data.js"></script>
+<script src="mobile.js"></script>
+</body>
+</html>

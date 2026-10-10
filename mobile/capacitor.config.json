@@ -1,0 +1,17 @@
+{
+  "appId": "vn.nhacviec.app",
+  "appName": "Nhắc Việc",
+  "webDir": "www",
+  "plugins": {
+    "LocalNotifications": {
+      "iconColor": "#3366FF"
+    },
+    "CapacitorHttp": {
+      "enabled": true
+    }
+  },
+  "server": {
+    "cleartext": true,
+    "androidScheme": "https"
+  }
+}

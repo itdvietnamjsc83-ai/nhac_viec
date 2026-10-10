@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'">
+<title>Nhắc Việc</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<aside class="sidebar">
+  <div class="brand"><span class="logo">🔔</span> Nhắc Việc</div>
+  <nav id="views">
+    <button data-view="today"><span class="ico">☀️</span>Hôm nay<span class="count" id="c-today"></span></button>
+    <button data-view="upcoming"><span class="ico">📅</span>7 ngày tới<span class="count" id="c-upcoming"></span></button>
+    <button data-view="overdue"><span class="ico">⚠️</span>Quá hạn<span class="count hot" id="c-overdue"></span></button>
+    <button data-view="queue"><span class="ico">🔔</span>Hàng đợi nhắc<span class="count" id="c-queue"></span></button>
+    <button data-view="all"><span class="ico">📋</span>Tất cả<span class="count" id="c-all"></span></button>
+    <button data-view="done"><span class="ico">✅</span>Đã xong<span class="count" id="c-done"></span></button>
+  </nav>
+  <div class="section-title">Dự án</div>
+  <div id="projects"></div>
+  <button id="btnSettings" class="side-foot">⚙️ Cài đặt</button>
+</aside>
+
+<main>
+  <div class="greet" id="greet"></div>
+  <header class="top">
+    <h1 id="viewTitle"></h1>
+    <div class="seg" id="modes">
+      <button data-mode="list" class="on">Danh sách</button>
+      <button data-mode="board">Bảng</button>
+      <button data-mode="calendar">Lịch</button>
+      <button data-mode="timeline">Tiến độ</button>
+    </div>
+    <input id="search" type="search" placeholder="🔍 Tìm…">
+    <div class="menu-wrap">
+      <button id="btnExcel" class="soft">📦 Dữ liệu ▾</button>
+      <div id="excelMenu" class="menu hidden">
+        <div class="menu-h">Excel</div>
+        <button data-x="import">⬆️ Nhập tiến độ từ file Excel</button>
+        <button data-x="export">⬇️ Xuất danh sách đang xem ra Excel</button>
+        <button data-x="template">📄 Tải file Excel mẫu</button>
+        <div class="menu-h">Chuyển sang máy khác</div>
+        <button data-x="backup">📤 Xuất toàn bộ dữ liệu</button>
+        <button data-x="restore">📥 Nhập dữ liệu từ máy khác</button>
+        <div class="menu-h">Điện thoại</div>
+        <button data-x="phone">📱 Đồng bộ sang điện thoại</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="quick-add">
+    <span class="plus">＋</span>
+    <input id="quick" placeholder="Thêm việc nhanh… ví dụ: Họp giao ban 9h sáng mai !cao #Website @Lan" autocomplete="off">
+    <div id="quickPreview" class="chips"></div>
+    <button id="btnAdd" class="primary">Thêm chi tiết</button>
+  </div>
+
+  <section id="alerts" class="alerts hidden"></section>
+  <div id="summary" class="summary hidden"></div>
+  <section id="content"></section>
+</main>
+
+<div id="toast" class="toast hidden"></div>
+
+<dialog id="dlg">
+  <form id="form" method="dialog">
+    <input name="title" class="title-input" placeholder="Tên công việc" required>
+    <div class="field-label">Ưu tiên</div>
+    <div class="chips-pick" id="pickPriority">
+      <button type="button" data-v="high" class="p-high">● Cao</button>
+      <button type="button" data-v="medium" class="p-medium">● Trung bình</button>
+      <button type="button" data-v="low" class="p-low">● Thấp</button>
+      <button type="button" data-v="">Không</button>
+    </div>
+    <div class="field-label">Trạng thái</div>
+    <div class="chips-pick" id="pickStatus">
+      <button type="button" data-v="Chưa bắt đầu">Chưa bắt đầu</button>
+      <button type="button" data-v="Đang thực hiện">Đang thực hiện</button>
+      <button type="button" data-v="Tạm dừng">Tạm dừng</button>
+      <button type="button" data-v="Hoàn thành">Hoàn thành</button>
+    </div>
+    <div class="grid2">
+      <label>📁 Dự án<input name="project" list="projectList" placeholder="Không có"></label>
+      <label>👤 Người phụ trách<input name="owner" placeholder="Không có"></label>
+      <label>🚩 Ngày bắt đầu<input name="start" type="date"></label>
+      <label>📅 Hạn hoàn thành<input name="deadline" type="datetime-local"></label>
+      <label>⏰ Nhắc riêng lúc<input name="remindManual" type="datetime-local"></label>
+      <label id="doneField">✅ Hoàn thành lúc<input name="completedAt" type="datetime-local"></label>
+      <label>🔁 Lặp lại
+        <select name="repeat">
+          <option value="none">Không lặp</option><option value="daily">Hằng ngày</option>
+          <option value="weekly">Hằng tuần</option><option value="monthly">Hằng tháng</option>
+        </select>
+      </label>
+    </div>
+    <datalist id="projectList"></datalist>
+    <div class="quick-times">
+      <button type="button" data-q="15">+15 phút</button>
+      <button type="button" data-q="60">+1 giờ</button>
+      <button type="button" data-q="tomorrow">8:00 sáng mai</button>
+    </div>
+    <div class="remind-box">
+      <label>🔔 Nhắc trước hạn <span class="muted">(nhiều mốc, cách nhau dấu phẩy)</span>
+        <input name="remindBefore" placeholder="vd. 1 ngày, 2 giờ, 30 phút" autocomplete="off"></label>
+      <div class="quick-times" id="rbChips">
+        <button type="button" data-rb="15 phút">15 phút</button>
+        <button type="button" data-rb="30 phút">30 phút</button>
+        <button type="button" data-rb="1 giờ">1 giờ</button>
+        <button type="button" data-rb="2 giờ">2 giờ</button>
+        <button type="button" data-rb="1 ngày">1 ngày</button>
+        <button type="button" data-rb="3 ngày">3 ngày</button>
+        <button type="button" data-rb="1 tuần">1 tuần</button>
+      </div>
+      <div id="rbPreview" class="rb-preview"></div>
+    </div>
+    <div class="field-label">Các bước <span id="clCount" class="muted"></span></div>
+    <div id="checklist" class="checklist"></div>
+    <input id="clNew" class="cl-new" placeholder="＋ Thêm bước rồi bấm Enter">
+    <label class="prog-label">Tiến độ <b id="progOut">0%</b>
+      <input name="progress" type="range" min="0" max="100" step="5" value="0">
+    </label>
+    <label>📝 Ghi chú<textarea name="note" rows="2"></textarea></label>
+    <div id="history" class="history"></div>
+    <menu>
+      <button type="button" id="btnDelete" class="link-danger">Xóa việc</button>
+      <span class="spacer"></span>
+      <button value="cancel" formnovalidate class="soft">Hủy</button>
+      <button value="ok" class="primary">Lưu</button>
+    </menu>
+  </form>
+</dialog>
+
+<dialog id="dlgPhone" class="dlg-phone">
+  <h3>📱 Đồng bộ sang điện thoại</h3>
+  <div class="phone-grid">
+    <div class="qr" id="phQr"></div>
+    <div class="ph-steps">
+      <ol>
+        <li>Điện thoại và máy tính dùng <b>chung một mạng Wi-Fi</b>.</li>
+        <li>Mở app <b>Nhắc Việc</b> trên điện thoại, bấm <b>⟳</b> rồi <b>Quét mã QR</b>.</li>
+        <li>Hoặc chọn <b>Nhập địa chỉ</b> và gõ:</li>
+      </ol>
+      <div class="ph-code"><span class="muted">Địa chỉ</span><b id="phAddr">…</b><span class="muted">Mã</span><b id="phCode" class="code">……</b></div>
+      <div id="phStatus" class="ph-status">Đang chờ điện thoại kết nối…</div>
+    </div>
+  </div>
+  <p class="muted small" id="phNote">Cổng đồng bộ chỉ mở khi cửa sổ này đang mở và tự đóng sau 10 phút. Lần đầu, Windows có thể hỏi quyền tường lửa: chọn <b>Cho phép</b> (mạng riêng).
+    Không chung Wi-Fi? Dùng <b>📤 Xuất toàn bộ dữ liệu</b> rồi gửi file qua Zalo / email.</p>
+  <menu><button type="button" class="soft" id="phNew">Đổi mã mới</button><span style="flex:1"></span><button type="button" class="primary" id="phClose" autofocus>Xong</button></menu>
+</dialog>
+
+<dialog id="dlgSettings">
+  <form method="dialog" class="settings">
+    <h2>Cài đặt</h2>
+    <label class="switch"><input type="checkbox" id="setLogin"><span></span>Tự chạy khi mở máy</label>
+    <label class="switch"><input type="checkbox" id="setBrief"><span></span>Tóm tắt công việc mỗi sáng lúc
+      <input type="time" id="setBriefTime" value="08:00"></label>
+    <label class="switch"><input type="checkbox" id="setPopup"><span></span>Hiện cửa sổ cảnh báo nổi trên màn hình khi đến giờ</label>
+    <label class="switch"><input type="checkbox" id="setSound"><span></span>Phát âm báo</label>
+    <label class="row-label">Giờ nhắc mặc định cho việc nhập từ Excel
+      <select id="setHour"></select></label>
+    <div class="data-box">
+      <b>Chuyển dữ liệu sang máy khác</b>
+      <div class="muted">Xuất một file trên máy này, chép sang máy kia (USB, email, Zalo…) rồi bấm Nhập. Dùng được giữa Windows và Mac.</div>
+      <div class="data-btns"><button type="button" class="soft" data-x="backup">📤 Xuất toàn bộ dữ liệu</button><button type="button" class="soft" data-x="restore">📥 Nhập dữ liệu từ máy khác</button></div>
+    </div>
+    <div class="tips">
+      <b>Mẹo nhập nhanh</b>
+      <div><code>9h sáng mai</code> <code>3h chiều</code> <code>thứ 2</code> <code>15/10</code> <code>tuần sau</code>: đặt hạn và giờ nhắc</div>
+      <div><code>!cao</code> <code>!tb</code> <code>!thấp</code>: mức ưu tiên · <code>#Dự_án</code> · <code>@Người</code></div>
+      <div><code>hằng ngày</code> <code>hằng tuần</code> <code>hằng tháng</code>: lặp lại</div>
+    </div>
+    <menu><span class="spacer"></span><button value="ok" class="primary">Xong</button></menu>
+  </form>
+</dialog>
+
+<script src="lunar.js"></script>
+<script src="quickadd.js"></script>
+<script src="remind.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
